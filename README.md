@@ -1,5 +1,5 @@
 # unixshell
-
+요구사항 : https://ee209.kaist.ac.kr/assignments/assignment5/shellsupplementary.html 
 # TODO : 
  시작시, 프로그램은 유저의 home directory의 .ishrc파일을 읽는다.
  홈 디렉토리는 variable HOME 으로 명명된다.
