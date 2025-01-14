@@ -40,10 +40,13 @@ void read_ishrc(){
 	}
 	fclose(file);
 }
+
 int main(void){
-	// read_ishrc();
 	char line[MAX_LINE_LENGTH+1];
 	char *home_dir = getenv("HOME");
+	set_sighandler();
+	// read_ishrc();
+
 	while (1) {
 		printf("%% ");
 		if (!fgets(line, sizeof(line), stdin)) {

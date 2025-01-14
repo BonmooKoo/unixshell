@@ -3,7 +3,7 @@ CFLAGS = -Wall -Wextra -D_BSD_SOURCE -D_GNU_SOURCE
 
 TARGET = ish
 
-SRCS = main.c dynarray.c lexical_analysis.c syntactic_analysis.c execution.c
+SRCS = main.c dynarray.c lexical_analysis.c syntactic_analysis.c execution.c signal_handle.c
 
 OBJS = $(SRCS:.c=.o)
 

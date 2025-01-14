@@ -8,6 +8,7 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/signal.h>
 #include <signal.h>
 #include <errno.h>
 #include <ctype.h>

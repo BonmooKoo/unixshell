@@ -86,7 +86,7 @@ int lexical_analysis(const char *line, DynArray_T tokens) {
 		}
 	}
 
-	// /*test
+	/*test
 	printf("len : %d\n",DynArray_getLength(tokens));
 	for(int i=0;i<DynArray_getLength(tokens);i++){
 		Token *token = (Token *)DynArray_get(tokens, i);

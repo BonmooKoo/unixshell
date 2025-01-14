@@ -1,6 +1,6 @@
 #include "ish.h"
 int exec_setenv(char** args){
-	printf("hit im setenv\n");
+	// printf("hit im setenv\n");
 	if (args[1] == NULL) {
 		fprintf(stderr, "Error: setenv requires at least a variable name\n");
 		return -1;
@@ -23,7 +23,7 @@ int exec_setenv(char** args){
 }
 
 int exec_unsetenv(char** args){
-	printf("hit im unsetenv\n");
+	// printf("hit im unsetenv\n");
     if (args[1] == NULL) {
         fprintf(stderr, "Error: unsetenv requires a variable name\n");
         return -1;
@@ -38,8 +38,14 @@ int exec_unsetenv(char** args){
 }
 
 int exec_chdir(char** args){
-	printf("hit im chdir\n");
-	const char *dir = args[1] ? args[1] : getenv("HOME");
+	// printf("hit im chdir\n");
+    const char *dir;
+    if (args[1]){
+        dir= args[1];
+    }
+    else{
+        dir=getenv("HOME");
+    }
 	if (dir == NULL) {
 		fprintf(stderr, "Error: HOME not set\n");
 		return -1;
@@ -53,12 +59,13 @@ int exec_chdir(char** args){
 }
 
 int exec_exit(char** args){
-	printf("hit im exit\n");
+	// printf("hit im exit\n");
     exit(0);
 }
 
 int execution(DynArray_T commands){
 	fflush(NULL); //clear all IO buffer
+    
     for(int i=0;i<DynArray_getLength(commands);i++){
         //argument set
         Command* cur_command; 
@@ -67,21 +74,42 @@ int execution(DynArray_T commands){
         pid_t pid;
         char* args[512];
         args[0]=cmd;
+        int redirection=0;
         for(int j=0;j<DynArray_getLength(cur_command->args);j++){
             args[j+1]=DynArray_get(cur_command->args,j);
+            if (strcmp(args[j+1], ">") == 0 || strcmp(args[j+1], "<") == 0) {
+                redirection=1;
+            }
+
         }
         args[DynArray_getLength(cur_command->args)+1]=NULL; // EOF
         //run
         if(strcmp(cmd,"setenv")==0){
+            if(redirection){
+                fprintf(stderr, "Error: Redirection is not allowed with built-in commands\n");
+                return -1;
+            }
             exec_setenv(args);
         }
         else if(strcmp(cmd,"unsetenv")==0){
+            if(redirection){
+                fprintf(stderr, "Error: Redirection is not allowed with built-in commands\n");
+                return -1;
+            }
             exec_unsetenv(args);
         }
         else if(strcmp(cmd,"chdir")==0){
+            if(redirection){
+                fprintf(stderr, "Error: Redirection is not allowed with built-in commands\n");
+                return -1;
+            }
             exec_chdir(args);
         }
         else if(strcmp(cmd,"exit")==0){
+            if(redirection){
+                fprintf(stderr, "Error: Redirection is not allowed with built-in commands\n");
+                return -1;
+            }
             exec_exit(args);
         }
         else{
