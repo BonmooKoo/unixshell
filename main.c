@@ -1,136 +1,85 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <signal.h>
-#include <errno.h>
-#include <ctype.h>
+#include "ish.h"
 
-#include "dynarray.h"
-
-#define MAX_LINE_LENGTH 1023
-#define MAX_TOKEN_LENGTH 512 // why? just half of line length
-typedef struct{
-	//content of token
-	char content[MAX_TOKEN_LENGTH];
-	//this token is string (it is quoted)
-	int quoted;
-}Token; 
-
-uint error_handling(){
-
-}
-int add_token(DynArray_T tokens, const char *buffer, int quoted) {
-    Token *token = malloc(sizeof(Token));
-    if (!token) {
-        fprintf(stderr, "Error: Memory allocation failed\n");
-        return -1;
-    }
-    strncpy(token->content, buffer, MAX_TOKEN_LENGTH);
-    token->quoted = quoted;
-    DynArray_add(tokens, token);
-    return 0;
+int exec_setenv(char* args){
+        printf("hit im setenv\n");
 }
 
-int lexical_analysis(const char *line, DynArray_T tokens) {
-    printf("%s\n",line);
-    const char *ptr = line;
-    char buffer[MAX_TOKEN_LENGTH];
-    int index = 0;
-    int is_quote = 0;
-    char quote_char = '\0';
+int exec_unsetenv(char* args){
+        printf("hit im unsetenv\n");
 
-    while (*ptr != '\0') {
-        if (is_quote) {
-            if (*ptr == quote_char) {
-                // buffer[index] = '\0';
-                // if (add_token(tokens, buffer, 1) == -1) {
-                //     return -1;
-                // }
-                // index = 0;
-                is_quote = 0;
-            } else {
-                buffer[index++] = *ptr;
-                if (index >= MAX_TOKEN_LENGTH) {
-                    fprintf(stderr, "Error: Token too long\n");
-                    return -1;
+}
+
+int exec_chdir(char* args){
+        printf("hit im chdir\n");
+
+}
+
+int exec_exit(char* args){
+        printf("hit im exit\n");
+
+}
+
+int execution(DynArray_T commands){
+        fflush(NULL); //clear all IO buffer
+        Command* command; 
+        char* cmd;
+        pid_t pid[512];
+        
+        for(int i=0;i<DynArray_getLength(commands);i++){
+                command = DynArray_get(commands, i);
+                cmd = command->command;
+                char* args[512];
+                args[0]=cmd;
+                for(int j=0;j<DynArray_getLength(command->args);j++){
+                        args[j+1]=DynArray_get(command->args,j);
                 }
-            }
-        } else {
-            if (*ptr == '"' || *ptr == '\'') {
-                is_quote = 1;
-                quote_char = *ptr;
-                // if (index > 0) {
-                //     buffer[index] = '\0';
-                //     if (add_token(tokens, buffer, 0) == -1) {
-                //         return -1;
-                //     }
-                //     index = 0;
-                // }
-            } else if (isspace(*ptr)) {
-                if (index > 0) {
-                    buffer[index] = '\0';
-                    if (add_token(tokens, buffer, 0) == -1) {
-                        return -1;
-                    }
-                    index = 0;
+                args[DynArray_getLength(command->args)+1]=NULL;
+                
+                pid[i] = fork();
+                if (pid[i] == 0) {
+                        if(strcmp(cmd,"setenv")==0){
+                                exec_setenv(args);
+                        }
+                        else if(strcmp(cmd,"unsetenv")==0){
+                                exec_unsetenv(args);
+                        }
+                        else if(strcmp(cmd,"chdir")==0){
+                                exec_chdir(args);
+                        }
+                        else if(strcmp(cmd,"exit")==0){
+                                exec_exit(args);
+                        }
+                        else{
+                                if(execvp(cmd,args)==-1){
+                                        pid[i]=0;
+                                        // perror("execvp");
+                                        // exit(EXIT_FAILURE);
+                                }
+                        }              
                 }
-            } else if (*ptr == '|' || *ptr == '<' || *ptr == '>') {
-                if (index > 0) {
-                    buffer[index] = '\0';
-                    if (add_token(tokens, buffer, 0) == -1) {
-                        return -1;
-                    }
-                    index = 0;
-                }
-                buffer[0] = *ptr;
-                buffer[1] = '\0';
-                if (add_token(tokens, buffer, 0) == -1) {
-                    return -1;
-                }
-            } else {
-                buffer[index++] = *ptr;
-                if (index >= MAX_TOKEN_LENGTH) {
-                    fprintf(stderr, "Error: Token too long\n");
-                    return -1;
-                }
-            }
         }
-        ptr++;
-    }
-
-    if (is_quote) {
-        fprintf(stderr, "Error: Unmatched quote\n");
-        return -1;
-    }
-
-    if (index > 0) {
-        buffer[index] = '\0';
-        if (add_token(tokens, buffer, 0) == -1) {
-            return -1;
+        for(int i=0;i<DynArray_getLength(commands);i++){
+                if(pid[i]>0){
+                        waitpid(pid[i],NULL,0);
+                }
         }
-    }
-
-//     /*test
-    printf("len : %d\n",DynArray_getLength(tokens));
-    for(int i=0;i<DynArray_getLength(tokens);i++){
-        Token *token = (Token *)DynArray_get(tokens, i);
-        printf("test : %s\n",token->content);
-    }
-//     */
-    return 0;
+        return 0;
 }
-
 int execute_line(const char* line){
         // printf("%s\n",line);
         DynArray_T tokens = DynArray_new(0);//token array for token
+        DynArray_T commands = DynArray_new(0);//dynamic array for command
 	int lex=lexical_analysis(line,tokens);
         if (lex == -1 ){
                 return -1;
-        }	
+        }
+        int syn=syntactic_analysis(tokens,commands);
+        if (syn == -1 ){
+                return -1;
+        }
+        int exec=execution(commands);
+        DynArray_free(tokens);
+        DynArray_free(commands);
 }
 
 void read_ishrc(){
@@ -157,7 +106,6 @@ void read_ishrc(){
         fclose(file);
 }
 int main(void){
-        //print a prompt
         // read_ishrc();
 	char line[MAX_LINE_LENGTH+1];
         char *home_dir = getenv("HOME");
