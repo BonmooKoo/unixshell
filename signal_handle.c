@@ -23,7 +23,7 @@ void handle_sigquit(int sig){
         exit(0);
     }
     flag = 1;
-    printf("\nType Ctrl-\\ again within 5 seconds to exit\n%% ");
+    printf("\nType Ctrl-\\ again within 5 seconds to exit\n");
 
     alarm(5);
 }

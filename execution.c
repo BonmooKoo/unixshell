@@ -115,8 +115,12 @@ int execution(DynArray_T commands){
         else{
             pid = fork();
             if (pid == 0) {
+                //set signal handler to default
+                signal(SIGINT,SIG_DFL);
+                signal(SIGQUIT,SIG_DFL);
+                // sleep(10);
                 if(execvp(cmd,args)==-1){
-                    perror("execvp");
+                    perror(cmd);
                     exit(EXIT_FAILURE);
                 }
             }
