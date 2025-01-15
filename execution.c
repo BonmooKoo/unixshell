@@ -19,7 +19,6 @@ int exec_setenv(char** args){
 	}
     printf("setenv :: %s\n",getenv(var));
 	return 0;
-
 }
 
 int exec_unsetenv(char** args){
@@ -34,7 +33,6 @@ int exec_unsetenv(char** args){
         return -1;
     }
     return 0;
-
 }
 
 int exec_chdir(char** args){
@@ -214,7 +212,7 @@ int execution(DynArray_T commands){
                 }
             }
             ///////////////////////
-            //parent
+            ////////parent/////////
             ///////////////////////
             else if (pid>0){
                 if(input_fd!=-1){
