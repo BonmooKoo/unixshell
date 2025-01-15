@@ -45,14 +45,21 @@ int syntactic_analysis(DynArray_T tokens,DynArray_T commands){
 			if(i==num-1){
 				// cat |
 				fprintf(stderr,"test2");
-
 				fprintf(stderr,"Invalid:Missing command name\n");
 				DynArray_free(commands);
 				return -1;
 			}
+			//add command before |
 			DynArray_add(commands,current_command);
+
+			//add |
+			current_command = (Command*)malloc(sizeof(Command));
+			strncpy(current_command->command, token->content, strlen(token->content));
+			DynArray_add(commands,current_command);
+			current_command->args=DynArray_new(0);
 			prev_token=token;
-			current_command=NULL;
+			
+			current_command = NULL;
 			in_pipe=1;
 		}
 		else if(strcmp(token->content,"<")==0 && token->quoted!=1 ){
@@ -71,7 +78,7 @@ int syntactic_analysis(DynArray_T tokens,DynArray_T commands){
 				return -1;
 			}
 			if(i==num-1 || (strcmp(prev_token->content,"|")==0&&prev_token->quoted!=1) ){
-				// 1. cat <
+				// 1. cat file1 <
 				// 2. cat | <
 				fprintf(stderr,"Invalid: Standard input redirection without file name\n");
 				DynArray_free(commands);
@@ -83,9 +90,13 @@ int syntactic_analysis(DynArray_T tokens,DynArray_T commands){
 				return -1;
 			}
 			left_redir=1;
-			DynArray_add(commands,current_command);
-			prev_token=token;// prev_token = "<"
-			current_command=NULL;
+			// add < as argument
+			DynArray_add(current_command->args,token);
+			prev_token=token;
+
+			// DynArray_add(commands,current_command);
+			// prev_token=token;// prev_token = "<"
+			// current_command=NULL;
 		}
 		else if(strcmp(token->content,">")==0 && token->quoted!=1 ){
 			if(right_redir ){
@@ -115,14 +126,18 @@ int syntactic_analysis(DynArray_T tokens,DynArray_T commands){
 				return -1;
 			}
 			right_redir=1;
-			DynArray_add(commands,current_command);
+			// add > as argument
+			DynArray_add(current_command->args,token);
 			prev_token=token;
-			current_command=NULL;
+
+			// DynArray_add(commands,current_command);
+			// prev_token=token;
+			// current_command=NULL;			
 		}
 		else{
 			if(current_command==NULL){
 				//First token is function name
-				// printf("%s\n",token->content);
+				printf("%s\n",token->content);
 				current_command = (Command*)malloc(sizeof(Command));
 				strncpy(current_command->command, token->content, strlen(token->content));
 				current_command->args=DynArray_new(0);
@@ -145,7 +160,7 @@ int syntactic_analysis(DynArray_T tokens,DynArray_T commands){
 		}
 		DynArray_add(commands, current_command);
 	}
-	/*//test
+	// /*//test
 	printf("Parsed Commands:\n");
 	for (int i = 0; i < DynArray_getLength(commands); i++) {
 		Command *cmd = DynArray_get(commands, i);
@@ -154,6 +169,7 @@ int syntactic_analysis(DynArray_T tokens,DynArray_T commands){
 			printf("  Argument: %s\n", (char *)DynArray_get(cmd->args, j));
 		}
 	}
-	*/
+	// */
+
 }
 
