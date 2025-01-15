@@ -137,7 +137,7 @@ int syntactic_analysis(DynArray_T tokens,DynArray_T commands){
 		else{
 			if(current_command==NULL){
 				//First token is function name
-				printf("%s\n",token->content);
+				// printf("%s\n",token->content);
 				current_command = (Command*)malloc(sizeof(Command));
 				strncpy(current_command->command, token->content, strlen(token->content));
 				current_command->args=DynArray_new(0);
@@ -160,7 +160,7 @@ int syntactic_analysis(DynArray_T tokens,DynArray_T commands){
 		}
 		DynArray_add(commands, current_command);
 	}
-	// /*//test
+	/*//test
 	printf("Parsed Commands:\n");
 	for (int i = 0; i < DynArray_getLength(commands); i++) {
 		Command *cmd = DynArray_get(commands, i);

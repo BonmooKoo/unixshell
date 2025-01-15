@@ -21,12 +21,12 @@ void read_ishrc(){
 	//1. READ ishrc file
 	char *home_dir = getenv("HOME");
 	char ishrc_path[MAX_LINE_LENGTH];
-	snprintf(ishrc_path,sizeof(ishrc_path),"%s/sampleish",home_dir);
-	//snprintf(ishrc_path,sizeof(ishrc_path),"%s/.ishrc",home_dir);
-	printf("%s\n",ishrc_path);
+	// snprintf(ishrc_path,sizeof(ishrc_path),"%s/sampleish",home_dir);
+	snprintf(ishrc_path,sizeof(ishrc_path),"%s/.ishrc",home_dir);
+	// printf("%s\n",ishrc_path);
 	FILE *file = fopen(ishrc_path,"r");
 	if (!file) {
-		printf("return\n");
+		// printf("return\n");
 		return;
 	}
 	char line[MAX_LINE_LENGTH+1];
@@ -45,7 +45,8 @@ int main(void){
 	char line[MAX_LINE_LENGTH+1];
 	char *home_dir = getenv("HOME");
 	set_sighandler();
-	// read_ishrc();
+	read_ishrc();
+	fflush(NULL); //clear all IO buffer
 
 	while (1) {
 		printf("%% ");

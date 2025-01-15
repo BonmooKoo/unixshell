@@ -17,7 +17,7 @@ int exec_setenv(char** args){
 		perror("setenv");
 		return -1;
 	}
-    printf("setenv :: %s\n",getenv(var));
+    // printf("setenv :: %s\n",getenv(var));
 	return 0;
 }
 
@@ -97,7 +97,7 @@ int execution(DynArray_T commands){
                 //ex : cat  <    b
                 //    [j] [j+1] [j+2]
                 char* input_file=DynArray_get(cur_command->args,j+1);
-                printf("inputfile:%s\n",input_file);
+                // printf("inputfile:%s\n",input_file);
                 input_fd=open(input_file,O_RDONLY);
                 if(input_fd==-1) {
                     perror(input_file);
@@ -111,7 +111,7 @@ int execution(DynArray_T commands){
                 //ex : cat  >    b
                 //    [j] [j+1] [j+2]
                 char* output_file=DynArray_get(cur_command->args,j+1);
-                printf("outputfile:%s\n",output_file);
+                // printf("outputfile:%s\n",output_file);
 
                 output_fd=open(output_file,O_WRONLY|O_CREAT|O_TRUNC,0600);
                 if(output_fd==-1) {
@@ -144,7 +144,7 @@ int execution(DynArray_T commands){
             }
             exec_unsetenv(args);
         }
-        else if(strcmp(cmd,"chdir")==0){
+        else if(strcmp(cmd,"cd")==0){
             if(redirection){
                 fprintf(stderr, "Error: Redirection is not allowed with built-in commands\n");
                 return -1;

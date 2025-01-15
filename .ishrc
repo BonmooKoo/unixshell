@@ -1,2 +1,24 @@
-cat main.c
-ls	
+cat file1 | grep main
+cat file1 | cat
+cat file2 | grep test | wc -l
+cat file1 |
+| file1
+cat file1 | | wc -l
+cat < file1
+cat > file1
+cat < file1 > file2
+cat > file1 < file2
+cat file1 > file2
+cat > file2 file1
+cat file1 | grep main > result
+cat < file1 | grep main > result
+cat < file1 | grep main > result
+< file1
+cat file1 <
+cat file1 < | grep str
+cat file1 >
+cat file1 > | grep str
+cat file1 > file2 > file3
+cat < file1 < file2
+cat file1 | cat < file2
+cat file1 > out  | grep str
