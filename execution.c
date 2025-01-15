@@ -75,12 +75,39 @@ int execution(DynArray_T commands){
         char* args[512];
         args[0]=cmd;
         int redirection=0;
+        int input_fd=-1; //File descriptor for input redirection "<"" 
+        int output_fd=-1; //File descriptor for output redirection ">"
+        int arg_index=0;
         for(int j=0;j<DynArray_getLength(cur_command->args);j++){
             args[j+1]=DynArray_get(cur_command->args,j);
-            if (strcmp(args[j+1], ">") == 0 || strcmp(args[j+1], "<") == 0) {
+            // if (strcmp(args[j+1], ">") == 0 || strcmp(args[j+1], "<") == 0) {
+            //     redirection=1;
+            // }
+            if( strcmp(args[j+1], "<") == 0 ){
+                //input_redirection
+                //ex : cat  <    b
+                //    [j] [j+1] [j+2]
+                args[j+2]=DynArray_get(cur_command->args,j+1);
+                input_fd=open(args[j+2],O_RDONLY);
+                if(input_fd==-1) {
+                    perror(args[j+2]);
+                    return -1;
+                }
                 redirection=1;
             }
-
+            else if( strcmp(args[j+1], ">") == 0 ){
+                //output_redirection
+                //ex : cat  >    b
+                //    [j] [j+1] [j+2]
+                args[j+2]=DynArray_get(cur_command->args,j+1);
+                output_fd=open(args[j+2],O_WRONLY|O_CREAT|O_TRUNC.0600);
+                if(output_fd==-1) {
+                    perror(args[j+2]);
+                    return -1;
+                }
+                redirection=1;
+            }
+            
         }
         args[DynArray_getLength(cur_command->args)+1]=NULL; // EOF
         //run

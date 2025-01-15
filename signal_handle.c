@@ -1,6 +1,6 @@
 #include "ish.h"
 
-volatile time_t last_sigquit_time = 0;
+volatile time_t last_time = 0;
 volatile sig_atomic_t flag = 0;
 
 void handle_sigint(int sig){
@@ -10,11 +10,11 @@ void handle_sigint(int sig){
 // void handle_sigquit(int sig) {
 //     time_t current_time = time(NULL);
 
-//     if (last_sigquit_time != 0 && difftime(current_time, last_sigquit_time) <= 5) {
+//     if (last_time != 0 && difftime(current_time, last_time) <= 5) {
 //         exit(0);
 //     }
 
-//     last_sigquit_time = current_time;
+//     last_time = current_time;
 //     printf("\nType Ctrl-\\ again within 5 seconds to exit.\n");
 // }
 
@@ -47,7 +47,6 @@ void set_sighandler(){
     sigaction(SIGQUIT, &sa_quit, NULL);
 
     //SIGALRM
-    // Install signal handler for alarm
     struct sigaction sa_alarm = {0};
     sa_alarm.sa_handler = handle_sigalarm;
     sa_alarm.sa_flags = SA_RESTART;

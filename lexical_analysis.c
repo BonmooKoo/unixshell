@@ -81,12 +81,12 @@ int lexical_analysis(const char *line, DynArray_T tokens) {
 
 	if (index > 0) {
 		buffer[index] = '\0';
-		if (add_token(tokens, buffer, 0) == -1) {
+		if (add_token(tokens, buffer, was_quote) == -1) {
 			return -1;
 		}
 	}
 
-	/*test
+	// /*test
 	printf("len : %d\n",DynArray_getLength(tokens));
 	for(int i=0;i<DynArray_getLength(tokens);i++){
 		Token *token = (Token *)DynArray_get(tokens, i);
