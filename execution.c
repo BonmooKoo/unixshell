@@ -13,10 +13,13 @@ int exec_setenv(char** args){
     else{
         value="";
     }
+    printf("%s %s\n",var,value);
+
 	if (setenv(var, value, 1) == -1) {
 		perror("setenv");
 		return -1;
 	}
+    // printf("get :%s\n",getenv(var));
     // printf("setenv :: %s\n",getenv(var));
 	return 0;
 }
@@ -39,9 +42,10 @@ int exec_chdir(char** args){
 	// printf("hit im chdir\n");
     const char *dir;
     if (args[1]){
-        dir= args[1];
+        dir = args[1];
     }
     else{
+		// fprintf(stderr, "HOME\n");
         dir=getenv("HOME");
     }
 	if (dir == NULL) {

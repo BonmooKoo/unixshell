@@ -45,7 +45,7 @@ int main(void){
 	char line[MAX_LINE_LENGTH+1];
 	char *home_dir = getenv("HOME");
 	set_sighandler();
-	read_ishrc();
+	// read_ishrc();
 	fflush(NULL); //clear all IO buffer
 
 	while (1) {
